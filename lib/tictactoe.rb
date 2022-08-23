@@ -1,7 +1,7 @@
 require 'pp'
 class TicTacToe
 
-  attr_accessor :board, :n, :n, :move, :player_hash, :empty_hash, :total_moves, :p0_moves_left, :p1_moves_left, :total_win_states, :keys
+  attr_accessor :board, :n, :move, :player_hash, :p0_moves_left, :p1_moves_left, :keys
 
   def initialize(n)
     self.n = n
@@ -12,7 +12,6 @@ class TicTacToe
     self.p1_moves_left = n**2/2
     self.player_hash = Hash.new { |h,k| h[k] = Hash.new(0) }
     self.keys = ((0..self.n).map{|i| ["x#{i}","y#{i}"]} + ["x+y",["x-y"]]).flatten
-    self.total_win_states = n*2+2
   end 
 
 
@@ -68,11 +67,7 @@ class TicTacToe
   end
 
   def next_turn()
-    if self.current_player()==0
-      self.p0_moves_left -=1
-    else 
-      self.p1_moves_left -=1
-    end 
+    self.current_player()==0 ?  self.p0_moves_left -=1 : self.p1_moves_left -=1
     self.move+=1
   end 
 
