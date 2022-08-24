@@ -10,16 +10,21 @@ class UserInterface
       puts "Select a position in 'x,y' format"
       begin
       inputs = gets.chomp.split(",").map{|input| Integer(input)}
-      rescue StandardError => e
-        puts "Input Error, please try again"
-      end
       if self.game.isValid?(inputs[0],inputs[1])
         self.game.make_move(inputs[0],inputs[1])
         break
       else
         puts "Invalid Position"
       end
+      rescue StandardError => e
+        puts "Input Error, please try again"
+      end
+  
+
     end 
+  end
+
+  def is_valid_input()
   end
 
 
@@ -28,12 +33,17 @@ class UserInterface
     puts "This is the board"
     self.show_board()
     loop do
+      begin
       make_move()
       self.show_board()
       break if self.game.p0_won? || self.game.p1_won?
       self.game.next_turn()
       break if self.game.p0_won? || self.game.p1_won?
       break if self.game.is_draw?
+      rescue Interrupt => e
+      puts "Game Over"
+      break
+      end
     end 
     puts "It's a Draw" if self.game.is_draw?
     puts "Player 0 Won" if self.game.p0_won?

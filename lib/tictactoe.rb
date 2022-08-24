@@ -11,7 +11,7 @@ class TicTacToe
     self.p0_moves_left = total_moves.even? ? n**2/2 : n**2/2+1
     self.p1_moves_left = n**2/2
     self.player_hash = Hash.new { |h,k| h[k] = Hash.new(0) }
-    self.keys = ((0..self.n).map{|i| ["x#{i}","y#{i}"]} + ["x+y",["x-y"]]).flatten
+    self.keys = ((1..self.n).map{|i| ["x#{i}","y#{i}"]} + ["x+y",["x-y"]]).flatten
   end 
 
 
@@ -58,7 +58,6 @@ class TicTacToe
       all_win_states_are_occupied = p0_hash.keys == self.keys && p1_hash.keys == self.keys     
       num_moves_insufficient = p0_winnable_states.all? {|state| self.n-p0_hash[state] >self.p0_moves_left} && p1_winnable_states.all? {|state| self.n-p1_hash[state] >self.p1_moves_left}
       draw = all_win_states_are_occupied || num_moves_insufficient
-      draw = num_moves_insufficient
       return draw
   end
 
@@ -73,8 +72,8 @@ class TicTacToe
 
   def isValid?(x,y)
     within_limits = x<=self.n && y<=self.n
-    in_empty_space = self.board[y-1][x-1]=="."
-    return within_limits && in_empty_space
+    within_limits ? in_empty_space = self.board[y-1][x-1]=="." : in_empty_space = nil
+    return in_empty_space
   end 
 
   def isFinished?
@@ -93,77 +92,55 @@ class TicTacToe
     end 
   end 
 
+  def run_random_game()
+  r = Random.new
+  moves_set = Array(1..self.n).product(Array(1..self.n))
+  moves_made = []
+  loop do
+    random_index = r.rand(moves_set.length)
+    move = moves_set[random_index]
+    moves_made.append(move)
+    moves_set.delete_at(random_index)
+    current_player =self.current_player()
+    self.make_move(move[0],move[1])
+    print self.show_board().map(&:join).join("\n")+"\n\n"
+    break if self.p0_won? || self.p1_won?
+    self.next_turn() 
 
+    break if self.p0_won? || self.p1_won?
+    break if self.is_draw?
+  end
+  print moves_made
+  print "\n"
+  puts "Player #{self.p0_won? ? 0:1} Won" if self.p0_won? || self.p1_won? 
+  puts "Draw" if self.is_draw? 
+  print self.board
+  end
+
+  def rerun_random_game(moves)
+    for move in moves do
+      current_player =self.current_player()
+      self.make_move(move[0],move[1])
+      break if self.p0_won? || self.p1_won?
+      self.next_turn() 
+      print self.show_board().map(&:join).join("\n")+"\n\n"
+      break if self.p0_won? || self.p1_won?
+
+      break if self.is_draw?
+  
+    end
+    print moves
+    print "\n"
+    puts "Player #{self.p0_won? ? 0:1} Won" if self.p0_won? || self.p1_won? 
+    puts "Draw" if self.is_draw? 
+  end
 
 end 
 
 
 
 
-# ui = UserInterface.new("Player 1","Player 2", TicTacToe.new(3))
-# ui.play_game()
+# game = TicTacToe.new(8)
 
-game = TicTacToe.new(3)
-# game.run_random_game()
-# game.rerun_random_game([[3, 1], [3, 2], [1, 1], [1, 3], [1, 2], [2, 1], [2, 3]])
-# game.run_game_print([[2, 1], [1, 3], [3, 2], [2, 2], [2, 3], [1, 2], [3, 1], [3, 3], [1, 1]])
+# game.rerun_random_game([[1, 1], [1, 2], [1, 3], [1, 4], [1, 5], [1, 6], [1, 7],[1,8],[2,8], [3,8], [4,8], [5,8], [6,8],[7,8],[8,8],[8,7],[8,6],[8,5],[8,4],[8,3],[8,2],[8,1],[7,1],[6,1],[5,1],[4,1],[3,1],[2,1],[7,2],[2,2],[2,7],[7,7]])
 
-
-# def run_game_print(moves)
-#   print moves
-#   print "\n"
-#   for i in moves
-#     print i 
-#     print "\n"
-#     self.make_move(i[0],i[1])
-#     self.next_turn() 
-#     print self.show_board().map(&:join).join("\n")+"\n"
-#     print("WON", self.p0_won? || self.p1_won?)
-#     print("DRAW", self.is_draw?)
-#     print("--------\n")
-#   end 
-# end 
-
-# def run_random_game()
-#   r = Random.new
-#   moves_set = Array(1..self.n).product(Array(1..self.n))
-#   moves_made = []
-#   loop do
-#     random_index = r.rand(moves_set.length)
-#     move = moves_set[random_index]
-#     moves_made.append(move)
-#     moves_set.delete_at(random_index)
-#     current_player =self.current_player()
-#     self.make_move(move[0],move[1])
-#     print self.show_board().map(&:join).join("\n")+"\n\n"
-#     break if self.p0_won? || self.p1_won?
-#     self.next_turn() 
-
-#     break if self.p0_won? || self.p1_won?
-#     break if self.is_draw?
-#   end
-#   print moves_made
-#   print "\n"
-#   puts "Player #{self.p0_won? ? 0:1} Won" if self.p0_won? || self.p1_won? 
-#   puts "Draw" if self.is_draw? 
-#   print self.board
-# end
-
-# def rerun_random_game(moves)
-#   for move in moves do
-#     current_player =self.current_player()
-#     self.make_move(move[0],move[1])
-#     break if self.p0_won? || self.p1_won?
-#     self.next_turn() 
-#     print self.show_board().map(&:join).join("\n")+"\n\n"
-#     break if self.p0_won? || self.p1_won?
-
-#     break if self.is_draw?
- 
-#   end
-#   print moves
-#   print "\n"
-#   puts "Player #{self.p0_won? ? 0:1} Won" if self.p0_won? || self.p1_won? 
-#   puts "Draw" if self.is_draw? 
-#   print self.board
-# end
